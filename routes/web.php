@@ -11,6 +11,22 @@
 |
 */
 
+$locales = config('app.locales');
+
 Route::get('/', function () {
-    return view('welcome');
+    return redirect(app()->getLocale());
+});
+
+$allowedLanguages = sprintf('%s', implode('|', $locales));
+
+Route::group([
+    'prefix' => '{locale}',
+    'where' => ['locale' => $allowedLanguages],
+    'middleware' => 'setlocale',
+], function() {
+    Route::get('/', function () {
+        return view('welcome');
+    })->name('home');
+
+    Route::get('/categories', 'CategoriesController@index')->name('categories.index');
 });
